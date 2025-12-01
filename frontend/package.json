@@ -1,0 +1,9 @@
+{
+  "dependencies": {
+    "axois": "^0.0.1-security",
+    "jwt-decode": "^4.0.0",
+    "nanoid": "^5.1.6",
+    "react-router-dom": "^7.9.6",
+    "zustand": "^5.0.8"
+  }
+}

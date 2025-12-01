@@ -1,0 +1,17 @@
+meta {
+  name: Get Bids by Item ID
+  type: http
+  seq: 1
+}
+
+get {
+  url: {{baseUrl}}/api/items/{{itemId}}/bids
+  body: none
+  auth: none
+}
+
+vars:pre-request {
+  baseUrl: https://kitek.ktkv.dev/marketplace
+  itemId: 1
+}
+

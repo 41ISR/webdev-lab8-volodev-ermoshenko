@@ -1,0 +1,21 @@
+meta {
+  name: Get My Bids
+  type: http
+  seq: 3
+}
+
+get {
+  url: {{baseUrl}}/api/bids/my
+  body: none
+  auth: bearer
+}
+
+headers {
+  Authorization: Bearer {{token}}
+}
+
+vars:pre-request {
+  baseUrl: https://kitek.ktkv.dev/marketplace
+  token: your-jwt-token-here
+}
+

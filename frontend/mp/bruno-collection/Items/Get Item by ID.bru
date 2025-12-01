@@ -1,0 +1,17 @@
+meta {
+  name: Get Item by ID
+  type: http
+  seq: 2
+}
+
+get {
+  url: {{baseUrl}}/api/items/{{itemId}}
+  body: none
+  auth: none
+}
+
+vars:pre-request {
+  baseUrl: https://kitek.ktkv.dev/marketplace
+  itemId: 1
+}
+

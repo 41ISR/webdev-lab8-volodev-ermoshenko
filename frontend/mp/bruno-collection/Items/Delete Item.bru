@@ -1,0 +1,22 @@
+meta {
+  name: Delete Item
+  type: http
+  seq: 4
+}
+
+delete {
+  url: {{baseUrl}}/api/items/{{itemId}}
+  body: none
+  auth: bearer
+}
+
+headers {
+  Authorization: Bearer {{token}}
+}
+
+vars:pre-request {
+  baseUrl: https://kitek.ktkv.dev/marketplace
+  token: your-jwt-token-here
+  itemId: 1
+}
+

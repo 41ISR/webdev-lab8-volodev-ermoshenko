@@ -1,0 +1,21 @@
+meta {
+  name: Get Me
+  type: http
+  seq: 3
+}
+
+get {
+  url: {{baseUrl}}/api/auth/me
+  body: none
+  auth: bearer
+}
+
+headers {
+  Authorization: Bearer {{token}}
+}
+
+vars:pre-request {
+  baseUrl: https://kitek.ktkv.dev/marketplace
+  token: your-jwt-token-here
+}
+

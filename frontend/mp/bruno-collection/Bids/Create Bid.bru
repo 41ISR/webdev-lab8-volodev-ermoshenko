@@ -1,0 +1,29 @@
+meta {
+  name: Create Bid
+  type: http
+  seq: 2
+}
+
+post {
+  url: {{baseUrl}}/api/items/{{itemId}}/bids
+  body: json
+  auth: bearer
+}
+
+headers {
+  Content-Type: application/json
+  Authorization: Bearer {{token}}
+}
+
+body:json {
+  {
+    "amount": 85000
+  }
+}
+
+vars:pre-request {
+  baseUrl: https://kitek.ktkv.dev/marketplace
+  token: your-jwt-token-here
+  itemId: 1
+}
+
