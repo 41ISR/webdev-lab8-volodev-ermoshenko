@@ -1,11 +1,4 @@
-<!DOCTYPE html>
-<html lang="ru">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Вход - Маркетплейс</title>
-    <style>
-        .auth-container {
+ .auth-container {
             max-width: 450px;
             margin: 80px auto;
             background-color: white;
@@ -166,56 +159,3 @@
             color: #155724;
             border: 1px solid #c3e6cb;
         }
-    </style>
-</head>
-<body>
-    <div className="auth-container">
-        <div className="auth-header">
-            <div className="auth-icon">🔐</div>
-            <h1 className="auth-title">Вход</h1>
-            <p className="auth-subtitle">Войдите в свой аккаунт</p>
-        </div>
-
-        <div className="alert alert-error" id="error-alert">
-            Неверное имя пользователя или пароль
-        </div>
-
-        <form id="login-form">
-            <div className="form-group">
-                <label className="form-label">Имя пользователя</label>
-                <input 
-                    type="text" 
-                    className="form-input" 
-                    name="username"
-                    placeholder="Введите имя пользователя"
-                    required
-                    autocomplete="username"
-                >
-                <div className="form-error">Введите имя пользователя</div>
-            </div>
-
-            <div className="form-group">
-                <label className="form-label">Пароль</label>
-                <input 
-                    type="password" 
-                    className="form-input" 
-                    name="password"
-                    placeholder="Введите пароль"
-                    required
-                    autocomplete="current-password"
-                >
-                <div className="form-error">Введите пароль</div>
-            </div>
-
-            <button type="submit" className="btn-submit">Войти</button>
-        </form>
-
-        <div className="auth-divider">или</div>
-
-        <div className="auth-link">
-            Нет аккаунта? <a href="/register">Зарегистрироваться</a>
-        </div>
-    </div>
-
-</body>
-</html>

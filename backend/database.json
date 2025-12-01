@@ -1,5 +1,32 @@
 {
-  "items": [],
+  "items": [
+    {
+      "id": 1764314977914,
+      "title": "214",
+      "description": "21421",
+      "price": 5000,
+      "imageUrl": null,
+      "userId": 1764314633078,
+      "username": "123",
+      "status": "active",
+      "highestBid": null,
+      "bidCount": 0,
+      "createdAt": "2025-11-28T07:29:37.914Z"
+    },
+    {
+      "id": 1764315396068,
+      "title": "СЕНИНА ОКА С НОМЕРАМИ МЕТ",
+      "description": "норм",
+      "price": 35000,
+      "imageUrl": null,
+      "userId": 1764314633078,
+      "username": "123",
+      "status": "active",
+      "highestBid": null,
+      "bidCount": 0,
+      "createdAt": "2025-11-28T07:36:36.069Z"
+    }
+  ],
   "bids": [],
   "users": [
     {
@@ -8,6 +35,20 @@
       "email": "test@example.com",
       "password": "$2b$10$EgVDQPfrj9sgt3bDDXjX9egBZ5bL0JS.c/Vmgas3mS1YoAi8V9K8.",
       "createdAt": "2025-10-20T06:53:56.986Z"
+    },
+    {
+      "id": 1764307296728,
+      "username": "asd1",
+      "email": "asd@asd",
+      "password": "$2b$10$fOcs8eLZvCrH90Ql3SU0JO5UQkWQj/innZQROBPbStnazKKXHpIBq",
+      "createdAt": "2025-11-28T05:21:36.728Z"
+    },
+    {
+      "id": 1764314633078,
+      "username": "123",
+      "email": "123@123",
+      "password": "$2b$10$2pTrSLXyBdS2Iv/InJWg8eedLJpy8ZKHBvvVHfPsA7l75u33k3zwi",
+      "createdAt": "2025-11-28T07:23:53.078Z"
     }
   ]
 }
