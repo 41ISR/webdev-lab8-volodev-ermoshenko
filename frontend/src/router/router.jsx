@@ -1,51 +1,39 @@
-import { createBrowserRouter } from "react-router-dom"
-import ItemsList from "../pages/ItemsList"
-import Logout from "../pages/Logout"
-import Register from "../pages/Register"
-import Layout from "../pages/Layout"
-import CreateItem from "../pages/CreateItem"
-import MyBids from "../pages/MyBids"
-import SignIn from "../pages/SignIn"
+import { createBrowserRouter } from "react-router-dom";
+import Login from "../pages/Login";
+import Register from "../pages/Register";
+import ItemDetail from "../pages/ItemDetail";
+import Layout from "../components/Layout";
+import MyBids from "../pages/MyBids";
+import CreateItem from "../pages/CreateItem";
 
 export const router = createBrowserRouter(
-    [
-        {
-            path: "/logout",
-            element: <Logout />
-        },
-        {
-            path: "/",
-            element: <Layout />,
-            children:
-                [
-                    {
-                        index: true,
-                        element: <ItemsList />
-                    },
 
-                    {
-                        path: "/my-bids",
-                        element: <MyBids />
-                    },
-                    {
-                        path: "/create-item",
-                        element: <CreateItem />
-                    },
-                    {
-                        path: "/item/:id",
-                        element: <ItemDetail />
-                    }
-                ]
+    [   
+        {
+            "path": "/",
+            "element": <Layout />
         },
         {
-            path: "/login",
-            element: <SignIn />
+            "path": "/login",
+            "element": <Login/>
         },
         {
-            path: "/register",
-            element: <Register />
+            "path": "/register",
+            "element": <Register/>
         },
-
-
+        {
+            "path": "/item-detail",
+            "element": <ItemDetail/>
+        },
+        {
+            "path": "/my-bids",
+            "element": <MyBids />
+        },
+        {
+            "path": "/create-item",
+            "element": <CreateItem />
+        },
     ]
+
 )
+
