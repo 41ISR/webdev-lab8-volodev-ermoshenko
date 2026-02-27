@@ -440,3 +440,4 @@ curl -X GET http://localhost:3001/api/items
 
 Фронтенд по умолчанию смотрит на `http://localhost:3001/api`, но это можно
 переопределить через `VITE_API_BASE_URL`.
+Я устал.
