@@ -1,3 +1,5 @@
+// UNUSED: this store is no longer used; authentication is handled
+// by AuthContext. The file can be deleted.
 import { create } from 'zustand'
 import { persist, createJSONStorage } from 'zustand/middleware'
 
@@ -15,4 +17,4 @@ export const useUserStore = create()(
     ),
 )
 
-export default useUserStore
+export default null  // previously exported useUserStore

@@ -1,0 +1,15 @@
+{
+  "short_name": "Маркетплейс",
+  "name": "Маркетплейс",
+  "icons": [
+    {
+      "src": "vite.svg",
+      "type": "image/svg+xml",
+      "sizes": "any"
+    }
+  ],
+  "start_url": ".",
+  "display": "standalone",
+  "theme_color": "#ffffff",
+  "background_color": "#ffffff"
+}

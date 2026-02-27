@@ -1,74 +1,62 @@
-import { useState, useEffect } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
-import '../styles/style.css';
-import useUserStore from '../store/UserStore';
+import { useState } from 'react'
+import { useNavigate, Link } from 'react-router-dom'
+import { useAuth } from '../store/AuthContext'
+import '../styles/components.css'
 
-const Register = () => {
-  const [username, setUsername] = useState('');
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
-  const [error, setError] = useState('');
-  const [passwordStrength, setPasswordStrength] = useState(0);
-  const { register, isAuthenticated, loading } = useUserStore();
-  const navigate = useNavigate();
+export default function Register() {
+  const [username, setUsername] = useState('')
+  const [email, setEmail] = useState('')
+  const [password, setPassword] = useState('')
+  const [confirmPassword, setConfirmPassword] = useState('')
+  const [error, setError] = useState('')
+  const [loading, setLoading] = useState(false)
+  const [passwordStrength, setPasswordStrength] = useState('')
+  const { register } = useAuth()
+  const navigate = useNavigate()
 
-  useEffect(() => {
-    if (isAuthenticated) {
-      navigate('/');
-    }
-  }, [isAuthenticated, navigate]);
+  const calculatePasswordStrength = (pwd) => {
+    if (pwd.length === 0) return ''
+    if (pwd.length < 6) return 'weak'
+    if (pwd.length < 10) return 'medium'
+    return 'strong'
+  }
 
-  useEffect(() => {
-    if (password.length === 0) {
-      setPasswordStrength(0);
-    } else if (password.length < 6) {
-      setPasswordStrength(1);
-    } else if (password.length < 10) {
-      setPasswordStrength(2);
-    } else {
-      setPasswordStrength(3);
-    }
-  }, [password]);
+  const handlePasswordChange = (e) => {
+    const pwd = e.target.value
+    setPassword(pwd)
+    setPasswordStrength(calculatePasswordStrength(pwd))
+  }
 
   const handleSubmit = async (e) => {
-    e.preventDefault();
-    setError('');
+    e.preventDefault()
+    setError('')
 
-    if (!username || !password) {
-      setError('Заполните обязательные поля');
-      return;
-    }
-
-    if (username.length < 3) {
-      setError('Имя пользователя должно быть не менее 3 символов');
-      return;
+    if (password !== confirmPassword) {
+      setError('Пароли не совпадают')
+      return
     }
 
     if (password.length < 6) {
-      setError('Пароль должен быть не менее 6 символов');
-      return;
+      setError('Пароль должен быть не менее 6 символов')
+      return
     }
 
-    if (password !== confirmPassword) {
-      setError('Пароли не совпадают');
-      return;
+    if (username.length < 3) {
+      setError('Имя пользователя должно быть не менее 3 символов')
+      return
     }
 
-    const result = await register(username, password, email?.trim() || undefined);
-    if (result.success) {
-      navigate('/');
-    } else {
-      setError(result.error || 'Ошибка регистрации');
-    }
-  };
+    setLoading(true)
 
-  const getPasswordStrengthClass = () => {
-    if (passwordStrength === 0) return '';
-    if (passwordStrength === 1) return 'weak';
-    if (passwordStrength === 2) return 'medium';
-    return 'strong';
-  };
+    try {
+      await register(username, password, email || undefined)
+      navigate('/')
+    } catch (err) {
+      setError(err.message || 'Ошибка при регистрации')
+    } finally {
+      setLoading(false)
+    }
+  }
 
   return (
     <div className="auth-container">
@@ -79,7 +67,9 @@ const Register = () => {
       </div>
 
       {error && (
-        <div className="alert alert-error active">{error}</div>
+        <div className="alert alert-error active">
+          {error}
+        </div>
       )}
 
       <form onSubmit={handleSubmit}>
@@ -118,17 +108,17 @@ const Register = () => {
             type="password"
             className="form-input"
             value={password}
-            onChange={(e) => setPassword(e.target.value)}
+            onChange={handlePasswordChange}
             placeholder="Введите пароль"
             minLength={6}
             required
             autoComplete="new-password"
           />
-          <div className="password-strength">
-            <div
-              className={`password-strength-bar ${getPasswordStrengthClass()}`}
-            ></div>
-          </div>
+          {password && (
+            <div className="password-strength">
+              <div className={`password-strength-bar ${passwordStrength}`}></div>
+            </div>
+          )}
           <div className="form-hint">Минимум 6 символов</div>
         </div>
 
@@ -145,11 +135,7 @@ const Register = () => {
           />
         </div>
 
-        <button
-          type="submit"
-          className="btn-submit"
-          disabled={loading}
-        >
+        <button type="submit" className="btn-submit success" disabled={loading}>
           {loading ? 'Регистрация...' : 'Зарегистрироваться'}
         </button>
       </form>
@@ -160,8 +146,5 @@ const Register = () => {
         Уже есть аккаунт? <Link to="/login">Войти</Link>
       </div>
     </div>
-  );
-};
-
-export default Register;
-
+  )
+}

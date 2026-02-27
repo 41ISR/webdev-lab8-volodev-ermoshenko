@@ -1,92 +1,82 @@
-import { Link, useNavigate } from "react-router-dom"
-import Button from "../components/Button"
-import Input from "../components/Input"
-import { useUserStore } from "../store/UserStore"
-import { useState } from "react"
-import { api } from "../api/api"
+import { useState } from 'react'
+import { useNavigate, Link } from 'react-router-dom'
+import { useAuth } from '../store/AuthContext'
+import '../styles/components.css'
 
+export default function Login() {
+  const [username, setUsername] = useState('')
+  const [password, setPassword] = useState('')
+  const [error, setError] = useState('')
+  const [loading, setLoading] = useState(false)
+  const { login } = useAuth()
+  const navigate = useNavigate()
 
-const Login = () => {
-    const [error, setError] = useState("")
-    const navigate = useNavigate()
-    const { setSession } = useUserStore()
+  const handleSubmit = async (e) => {
+    e.preventDefault()
+    setError('')
+    setLoading(true)
 
-    const handleSubmit = async (e) => {
-        e.preventDefault()
-        setError("")
-
-        const user = {
-            username: e.target.username.value,
-            password: e.target.password.value
-        }
-
-        try {
-            const data = await api.loginUser(user)
-            console.log(data);
-            
-            setSession(data.data)
-            navigate("/")
-        } catch (error) {
-            console.log(error.response)
-            setError(error.response.data.error)
-            console.error(error)
-        }
+    try {
+      await login(username, password)
+      navigate('/')
+    } catch (err) {
+      setError(err.message || 'Неверное имя пользователя или пароль')
+    } finally {
+      setLoading(false)
     }
+  }
 
-    return (
-        <div className="container">
+  return (
+    <div className="auth-container">
+      <div className="auth-header">
+        <div className="auth-icon">🔐</div>
+        <h1 className="auth-title">Вход</h1>
+        <p className="auth-subtitle">Войдите в свой аккаунт</p>
+      </div>
 
-        <div class="auth-container">
-            {error.length > 0 && <div className="auth-error">{error}</div>}
-            <div class="auth-header">
-                <div class="auth-icon">🔐</div>
-                <h1 class="auth-title">Вход</h1>
-                <p class="auth-subtitle">Войдите в свой аккаунт</p>
-            </div>
-
-            <div class="alert alert-error" id="error-alert">
-                Неверное имя пользователя или пароль
-            </div>
-
-            <form id="login-form" onSubmit={handleSubmit}>
-                <div class="form-group">
-                    <label class="form-label">Имя пользователя</label>
-                    <Input 
-                        type="text" 
-                        class="form-input" 
-                        name="username"
-                        placeholder="Введите имя пользователя"
-                        required
-                        autocomplete="username"
-                    />
-                    <div class="form-error">Введите имя пользователя</div>
-                </div>
-
-                <div class="form-group">
-                    <label class="form-label">Пароль</label>
-                    <Input 
-                        type="password" 
-                        class="form-input" 
-                        name="password"
-                        placeholder="Введите пароль"
-                        required
-                        autocomplete="current-password"
-                    />
-                    <div class="form-error">Введите пароль</div>
-                </div>
-
-                <Button type="submit" class="btn-submit">Войти</Button>
-            </form>
-
-        <div class="auth-divider">или</div>
-
-        <div class="auth-link">
-            Нет аккаунта? <Link to={"/register"}>Зарегистрироваться</Link>
+      {error && (
+        <div className="alert alert-error active">
+          {error}
         </div>
+      )}
+
+      <form onSubmit={handleSubmit}>
+        <div className="form-group">
+          <label className="form-label">Имя пользователя</label>
+          <input
+            type="text"
+            className="form-input"
+            value={username}
+            onChange={(e) => setUsername(e.target.value)}
+            placeholder="Введите имя пользователя"
+            required
+            autoComplete="username"
+          />
+        </div>
+
+        <div className="form-group">
+          <label className="form-label">Пароль</label>
+          <input
+            type="password"
+            className="form-input"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            placeholder="Введите пароль"
+            required
+            autoComplete="current-password"
+          />
+        </div>
+
+        <button type="submit" className="btn-submit" disabled={loading}>
+          {loading ? 'Вход...' : 'Войти'}
+        </button>
+      </form>
+
+      <div className="auth-divider">или</div>
+
+      <div className="auth-link">
+        Нет аккаунта? <Link to="/register">Зарегистрироваться</Link>
+      </div>
     </div>
-    
-    </div>
-    ) 
+  )
 }
- 
-export default Login

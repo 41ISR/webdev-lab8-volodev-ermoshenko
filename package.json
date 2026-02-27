@@ -1,5 +1,4 @@
 {
-  "devDependencies": {
-    "nodemod": "^3.0.6"
-  }
+  "description": "this package.json is not used by the project and can be
+  deleted. It previously contained a devDependency for nodemod."
 }

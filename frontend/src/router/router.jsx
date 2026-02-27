@@ -22,8 +22,8 @@ export const router = createBrowserRouter(
             "element": <Register/>
         },
         {
-            "path": "/item-detail",
-            "element": <ItemDetail/>
+            "path": "/items/:id",
+            "element": <ItemDetail />
         },
         {
             "path": "/my-bids",

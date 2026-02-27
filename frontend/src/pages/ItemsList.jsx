@@ -1,18 +1,31 @@
-import { useEffect } from 'react';
-import { Link } from 'react-router-dom';
-import useItemsStore from '../store/itemsStore';
-import '../styles/style.css';
+import { useEffect } from 'react'
+import { Link } from 'react-router-dom'
+import useItemsStore from '../store/itemsStore'
+import '../styles/pages.css'
 
-const ItemsList = () => {
-  const { items, stats, loading, fetchItems, fetchStats } = useItemsStore();
+export default function ItemsList() {
+  const { items, stats, loading, error, fetchItems, fetchStats } = useItemsStore()
 
   useEffect(() => {
-    fetchItems();
-    fetchStats();
-  }, []);
+    // load both items and statistics from the store
+    fetchItems()
+    fetchStats()
+  }, [fetchItems, fetchStats])
 
-  if (loading && items.length === 0) {
-    return <div>Загрузка...</div>;
+  if (loading) {
+    return <div>Загрузка...</div>
+  }
+
+  if (error) {
+    return <div className="alert alert-error">{error}</div>
+  }
+
+  const formatPrice = (price) => {
+    return new Intl.NumberFormat('ru-RU').format(price) + ' ₽'
+  }
+
+  const getInitials = (username) => {
+    return username.substring(0, 2).toUpperCase()
   }
 
   return (
@@ -36,9 +49,7 @@ const ItemsList = () => {
             <span className="stat-label">Активных</span>
           </div>
           <div className="stat-item">
-            <span className="stat-value">
-              {formatPrice(stats.averageItemPrice)}
-            </span>
+            <span className="stat-value">{formatPrice(Math.round(stats.averageItemPrice))}</span>
             <span className="stat-label">Средняя цена</span>
           </div>
         </div>
@@ -53,33 +64,25 @@ const ItemsList = () => {
       ) : (
         <div className="items-grid">
           {items.map((item) => (
-            <Link
-              key={item.id}
-              to={`/items/${item.id}`}
-              className="item-card"
-            >
+            <Link key={item.id} to={`/items/${item.id}`} className="item-card">
               <img
-                src={
-                  item.imageUrl ||
-                  'https://via.placeholder.com/300x200/ecf0f1/95a5a6?text=No+Image'
-                }
+                src={item.imageUrl || `https://via.placeholder.com/300x200/3498db/ffffff?text=${encodeURIComponent(item.title)}`}
                 alt={item.title}
                 className="item-image"
+                onError={(e) => {
+                  e.target.src = `https://via.placeholder.com/300x200/ecf0f1/7f8c8d?text=${encodeURIComponent(item.title)}`
+                }}
               />
               <div className="item-content">
-                <span
-                  className={`status-badge ${
-                    item.status === 'active' ? 'status-active' : ''
-                  }`}
-                >
-                  {item.status === 'active' ? 'Активно' : 'Неактивно'}
+                <span className={`status-badge status-${item.status}`}>
+                  {item.status === 'active' ? 'Активно' : item.status}
                 </span>
                 <h3 className="item-title">{item.title}</h3>
                 <p className="item-description">{item.description}</p>
                 <div className="item-footer">
                   <div>
                     <div className="item-price">{formatPrice(item.price)}</div>
-                    {item.highestBid && (
+                    {item.highestBid && item.highestBid > item.price && (
                       <div className="bid-info">
                         Текущая ставка: {formatPrice(item.highestBid)}
                         {item.bidCount > 0 && (
@@ -89,9 +92,7 @@ const ItemsList = () => {
                     )}
                   </div>
                   <div className="item-meta">
-                    <span className="item-seller">
-                      Продавец: {item.username}
-                    </span>
+                    <span className="item-seller">Продавец: {item.username}</span>
                   </div>
                 </div>
               </div>
@@ -100,8 +101,5 @@ const ItemsList = () => {
         </div>
       )}
     </>
-  );
-};
-
-export default ItemsList;
-
+  )
+}

@@ -1,152 +1,251 @@
-import { Link, useParams } from "react-router-dom"
-import Input from "../components/Input"
-import Button from "../components/Button"
-import { useEffect, useState } from "react"
+import { useState, useEffect } from 'react'
+import { useParams, useNavigate, Link } from 'react-router-dom'
+import { itemsAPI, bidsAPI } from '../api/api'
+import { useAuth } from '../store/AuthContext'
+import '../styles/pages.css'
 
-import useItemsStore from "../store/itemsStore"
+export default function ItemDetail() {
+  const { id } = useParams()
+  const navigate = useNavigate()
+  const { user } = useAuth()
+  const [item, setItem] = useState(null)
+  const [bids, setBids] = useState([])
+  const [bidAmount, setBidAmount] = useState('')
+  const [loading, setLoading] = useState(true)
+  const [submitting, setSubmitting] = useState(false)
+  const [error, setError] = useState('')
 
-const ItemDetail = () => {
-    const { id } = useParams()
-    const [ItemShow, setItemShow] = useState(undefined)
-    const { items, getItems } = useItemsStore()
-    const {newBid, setNewBid} = useState()
-    useEffect(() => {
-        const fetch = async () => {
-            await getItems()
-        }
-        fetch()
-    }, [])
+  useEffect(() => {
+    loadItem()
+    loadBids()
+  }, [id])
 
-    useEffect(() => {
-        items && setItemShow(items.find((item) => item.id == id))
-    }, [items])
-
-    if (!ItemShow) return <></>
-
-
-
-    const handleBid = () => {
-
+  const loadItem = async () => {
+    try {
+      const itemData = await itemsAPI.getById(id)
+      if (!itemData) {
+        navigate('/')
+        return
+      }
+      setItem(itemData)
+      if (itemData.highestBid) {
+        setBidAmount(String(itemData.highestBid + 100))
+      } else {
+        setBidAmount(String(itemData.price + 100))
+      }
+    } catch (error) {
+      console.error('Failed to load item:', error)
+      navigate('/')
+    } finally {
+      setLoading(false)
     }
-    
-    return (
-        <div className="container">
+  }
 
-            <Link to={"/"}>← Вернуться к списку товаров</Link>
+  const loadBids = async () => {
+    try {
+      const bidsData = await bidsAPI.getByItemId(id)
+      setBids(bidsData)
+    } catch (error) {
+      console.error('Failed to load bids:', error)
+    }
+  }
 
-            <div class="item-detail">
-                <div class="item-header">
-                    <div>
-                         <img src={ItemShow.imageUrl} class="item-image-large" />
-                    </div>
+  const handleBidSubmit = async (e) => {
+    e.preventDefault()
+    if (!user) {
+      navigate('/login')
+      return
+    }
 
-                    <div class="item-info">
-                        <span class="item-status">{ItemShow.status}</span>
-                            
-                        <h1 class="item-title-large">{ItemShow.title}</h1>
-                            
-                        <div class="item-seller-info">
-                            <div class="seller-avatar">TS</div>
-                            <div class="seller-details">
-                                <div class="seller-name">{ItemShow.username}</div>
-                                <div class="seller-date">{ItemShow.createdAt}</div>
-                            </div>
-                        </div>
+    setError('')
+    setSubmitting(true)
 
-                        <div class="item-description-full">
-                            {ItemShow.description}
-                        </div>
+    try {
+      const amount = parseFloat(bidAmount)
+      await bidsAPI.create(id, amount)
+      await loadItem()
+      await loadBids()
+      setBidAmount(String(amount + 100))
+    } catch (err) {
+      setError(err.message || 'Ошибка при создании ставки')
+    } finally {
+      setSubmitting(false)
+    }
+  }
 
-                        <div class="price-section">
-                            <div class="starting-price">Начальная цена:</div>
-                            <div class="current-price">{ItemShow.price}</div>
-                            <div class="highest-bid">Текущая ставка: {ItemShow.highestBid}</div>
+  const handleDelete = async () => {
+    if (!confirm('Вы уверены, что хотите удалить этот товар?')) {
+      return
+    }
 
-                            <form class="bid-form" onSubmit={handleBid}>
-                                <Input 
-                                    type="number" 
-                                    class="bid-input" 
-                                    placeholder="Введите вашу ставку (мин. 70 001 ₽)"
-                                    min={ItemShow.highestBid}
-                                    step="100"
-                                />
-                                <Button type="submit" class="btn-bid">Сделать ставку</Button>
-                            </form>
-                        </div>
+    try {
+      await itemsAPI.delete(id)
+      navigate('/')
+    } catch (error) {
+      alert('Ошибка при удалении товара')
+    }
+  }
 
-                    </div>
-                </div>
+  const formatPrice = (price) => {
+    return new Intl.NumberFormat('ru-RU').format(price) + ' ₽'
+  }
 
-                {/* <div class="bids-section">
-                    <div class="bids-header">
-                        <h2 class="bids-title">История ставок</h2>
-                        <span class="bids-count">5</span>
-                </div>
+  const getInitials = (username) => {
+    return username.substring(0, 2).toUpperCase()
+  }
 
-                    <div class="bids-list">
-                        <div class="bid-item highest-bid-item">
-                            <div class="bid-user">
-                                <div class="bid-avatar">BB</div>
-                                <div class="bid-details">
-                                    <span class="bid-username">buyer_best</span>
-                                    <span class="bid-time">2 часа назад</span>
-                                </div>
-                                <span class="highest-badge">🏆 Лидирует</span>
-                            </div>
-                            <div class="bid-amount">70 000 ₽</div>
-                        </div>
+  const formatDate = (dateString) => {
+    const date = new Date(dateString)
+    return date.toLocaleDateString('ru-RU', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric'
+    })
+  }
 
-                        <div class="bid-item">
-                            <div class="bid-user">
-                                <div class="bid-avatar">JD</div>
-                                <div class="bid-details">
-                                    <span class="bid-username">john_doe</span>
-                                    <span class="bid-time">5 часов назад</span>
-                                </div>
-                            </div>
-                            <div class="bid-amount">68 000 ₽</div>
-                        </div>
+  const getTimeAgo = (dateString) => {
+    const date = new Date(dateString)
+    const now = new Date()
+    const diff = now - date
+    const hours = Math.floor(diff / (1000 * 60 * 60))
+    const days = Math.floor(diff / (1000 * 60 * 60 * 24))
 
-                        <div class="bid-item">
-                            <div class="bid-user">
-                                <div class="bid-avatar">AL</div>
-                                <div class="bid-details">
-                                    <span class="bid-username">alice_tech</span>
-                                    <span class="bid-time">1 день назад</span>
-                                </div>
-                            </div>
-                            <div class="bid-amount">67 000 ₽</div>
-                        </div>
+    if (days > 0) {
+      return `${days} ${days === 1 ? 'день' : days < 5 ? 'дня' : 'дней'} назад`
+    }
+    if (hours > 0) {
+      return `${hours} ${hours === 1 ? 'час' : hours < 5 ? 'часа' : 'часов'} назад`
+    }
+    return 'Только что'
+  }
 
-                        <div class="bid-item">
-                            <div class="bid-user">
-                                <div class="bid-avatar">MK</div>
-                                <div class="bid-details">
-                                    <span class="bid-username">mike_k</span>
-                                    <span class="bid-time">1 день назад</span>
-                                </div>
-                            </div>
-                            <div class="bid-amount">66 000 ₽</div>
-                        </div>
+  if (loading) {
+    return <div>Загрузка...</div>
+  }
 
-                        <div class="bid-item">
-                            <div class="bid-user">
-                                <div class="bid-avatar">ST</div>
-                                <div class="bid-details">
-                                    <span class="bid-username">sarah_tech</span>
-                                    <span class="bid-time">2 дня назад</span>
-                                </div>
-                            </div>
-                            <div class="bid-amount">65 500 ₽</div>
-                        </div> */}
-                    {/* </div> */}
-                {/* </div> */}
+  if (!item) {
+    return null
+  }
+
+  const isOwner = user && user.id === item.userId
+  const minBid = item.highestBid || item.price
+  const highestBidAmount = bids.length > 0 ? Math.max(...bids.map(b => b.amount)) : null
+
+  return (
+    <>
+      <Link to="/" className="back-link">← Вернуться к списку товаров</Link>
+
+      <div className="item-detail">
+        <div className="item-header">
+          <div>
+            <img
+              src={item.imageUrl || `https://via.placeholder.com/600x400/3498db/ffffff?text=${encodeURIComponent(item.title)}`}
+              alt={item.title}
+              className="item-image-large"
+              onError={(e) => {
+                e.target.src = `https://via.placeholder.com/600x400/ecf0f1/7f8c8d?text=${encodeURIComponent(item.title)}`
+              }}
+            />
+          </div>
+
+          <div className="item-info">
+            <span className={`item-status status-${item.status}`}>
+              {item.status === 'active' ? 'Активно' : item.status}
+            </span>
+
+            <h1 className="item-title-large">{item.title}</h1>
+
+            <div className="item-seller-info">
+              <div className="seller-avatar">{getInitials(item.username)}</div>
+              <div className="seller-details">
+                <div className="seller-name">{item.username}</div>
+                <div className="seller-date">Опубликовано: {formatDate(item.createdAt)}</div>
+              </div>
             </div>
-            
 
-   
+            <div className="item-description-full">
+              {item.description.split('\n').map((line, i) => (
+                <p key={i}>{line}</p>
+              ))}
+            </div>
+
+            <div className="price-section">
+              <div className="starting-price">Начальная цена:</div>
+              <div className="current-price">{formatPrice(item.price)}</div>
+              {item.highestBid && item.highestBid > item.price && (
+                <div className="highest-bid">Текущая ставка: {formatPrice(item.highestBid)}</div>
+              )}
+
+              {!isOwner && item.status === 'active' && user && (
+                <form className="bid-form" onSubmit={handleBidSubmit}>
+                  {error && (
+                    <div className="alert alert-error active">{error}</div>
+                  )}
+                  <input
+                    type="number"
+                    className="bid-input"
+                    value={bidAmount}
+                    onChange={(e) => setBidAmount(e.target.value)}
+                    placeholder={`Введите вашу ставку (мин. ${formatPrice(minBid + 1)})`}
+                    min={minBid + 1}
+                    step="100"
+                    required
+                  />
+                  <button type="submit" className="btn-bid" disabled={submitting}>
+                    {submitting ? 'Отправка...' : 'Сделать ставку'}
+                  </button>
+                </form>
+              )}
+
+              {!user && (
+                <div className="auth-link">
+                  <Link to="/login">Войдите</Link>, чтобы сделать ставку
+                </div>
+              )}
+            </div>
+
+            {isOwner && (
+              <button className="btn-delete" onClick={handleDelete}>
+                Удалить товар
+              </button>
+            )}
+          </div>
         </div>
-    )
-}
 
-export default ItemDetail
+        <div className="bids-section">
+          <div className="bids-header">
+            <h2 className="bids-title">История ставок</h2>
+            <span className="bids-count">{bids.length}</span>
+          </div>
+
+          {bids.length === 0 ? (
+            <div className="no-bids">
+              <p>Ставок пока нет. Станьте первым!</p>
+            </div>
+          ) : (
+            <div className="bids-list">
+              {bids.map((bid) => (
+                <div
+                  key={bid.id}
+                  className={`bid-item ${highestBidAmount === bid.amount ? 'highest-bid-item' : ''}`}
+                >
+                  <div className="bid-user">
+                    <div className="bid-avatar">{getInitials(bid.username)}</div>
+                    <div className="bid-details">
+                      <span className="bid-username">{bid.username}</span>
+                      <span className="bid-time">{getTimeAgo(bid.createdAt)}</span>
+                    </div>
+                    {highestBidAmount === bid.amount && (
+                      <span className="highest-badge">🏆 Лидирует</span>
+                    )}
+                  </div>
+                  <div className="bid-amount">{formatPrice(bid.amount)}</div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      </div>
+    </>
+  )
+}
